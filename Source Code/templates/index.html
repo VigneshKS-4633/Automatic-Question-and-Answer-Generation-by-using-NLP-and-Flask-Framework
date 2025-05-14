@@ -1,0 +1,312 @@
+{% extends 'layout.html' %}
+{% block body %}
+<!-- Hero Section -->
+<div class="text-center mb-12 animate__animated animate__fadeIn">
+    
+</div>
+
+<!-- Main Form Section -->
+<div class="max-w-4xl mx-auto mb-16">
+    <div class="glass-card p-8 animate__animated animate__fadeInUp">
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+            <!-- Left Column - Form -->
+            <div class="space-y-6">
+                <div class="text-center md:text-left">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Generate Questions & Answers</h2>
+                    <p class="text-gray-600">Enter your text and customize the output</p>
+                </div>
+                
+                <form method="POST" action="test_generate" class="space-y-6" id="testForm">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Input Text
+                        </label>
+                        <textarea 
+                            name="itext" 
+                            id="inputText"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                            placeholder="Enter your text here..."
+                            rows="6" 
+                            required
+                        ></textarea>
+                        <div id="textAnalysis" class="mt-4 hidden">
+                            <div class="bg-white rounded-lg p-4 shadow-sm space-y-4">
+                                <div class="flex items-center space-x-2 text-sm text-gray-600">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span id="difficultyLevel"></span>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Keywords:</h4>
+                                    <div id="keywordsList" class="flex flex-wrap gap-2"></div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Topics:</h4>
+                                    <div id="topicsList" class="space-y-2"></div>
+                                </div>
+                                
+                                <div class="text-sm text-indigo-600" id="suggestion"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Question Type
+                        </label>
+                        <select 
+                            name="test_type" 
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                            required
+                        >
+                            <option value="objective">Objective</option>
+                            <option value="subjective">Subjective</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Number of Questions
+                        </label>
+                        <input 
+                            type="number" 
+                            name="noq" 
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                            placeholder="Enter number of questions (1-20)"
+                            min="1" 
+                            max="20"
+                            required
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Difficulty Level
+                        </label>
+                        <select 
+                            name="difficulty" 
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                        >
+                            <option value="auto">Auto-detect</option>
+                            <option value="basic">Basic</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                    
+                    <button 
+                        type="submit" 
+                        class="w-full btn-gradient py-3 px-6 rounded-lg text-white font-medium hover:shadow-lg transition duration-200 flex items-center justify-center space-x-2"
+                    >
+                        <i class="fas fa-magic"></i>
+                        <span>Generate Questions</span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Right Column - Image and Features -->
+            <div class="space-y-6">
+                <div class="hidden md:block">
+                    <img 
+                        src="{{ url_for('static', filename='question.jpg') }}" 
+                        alt="Question Generation Illustration"
+                        class="rounded-2xl shadow-xl transform hover:scale-105 transition duration-300"
+                    >
+                </div>
+                
+                <!-- AI Features Section -->
+                <div class="bg-white rounded-lg p-4 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">AI-Powered Features</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start space-x-2">
+                            <i class="fas fa-brain text-indigo-500 mt-1"></i>
+                            <span class="text-sm text-gray-600">Smart text analysis for difficulty assessment</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fas fa-key text-indigo-500 mt-1"></i>
+                            <span class="text-sm text-gray-600">Automatic keyword extraction</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fas fa-lightbulb text-indigo-500 mt-1"></i>
+                            <span class="text-sm text-gray-600">Intelligent question type suggestions</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fas fa-chart-bar text-indigo-500 mt-1"></i>
+                            <span class="text-sm text-gray-600">Difficulty level analysis</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fas fa-layer-group text-indigo-500 mt-1"></i>
+                            <span class="text-sm text-gray-600">Topic clustering and organization</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fas fa-check-circle text-indigo-500 mt-1"></i>
+                            <span class="text-sm text-gray-600">Answer quality validation</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fas fa-random text-indigo-500 mt-1"></i>
+                            <span class="text-sm text-gray-600">Question variety analysis</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- About Section -->
+<section id="about" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-8 gradient-text">About the Project</h2>
+        <div class="max-w-3xl mx-auto text-gray-600 space-y-4">
+            <p>
+                This Question and Answer Generator is a societal project developed by students at CMR Institute of Technology, Bangalore. 
+                The project aims to provide an innovative solution for educators, students, and professionals to generate high-quality 
+                questions and answers from any given text.
+            </p>
+            <p>
+                Using advanced Natural Language Processing and Machine Learning techniques, the system analyzes text content, 
+                identifies key concepts, and generates relevant questions with comprehensive answers. The tool is designed to 
+                support various learning objectives and difficulty levels.
+            </p>
+            <p>
+                Key objectives of this project include:
+            </p>
+            <ul class="list-disc list-inside space-y-2">
+                <li>Simplifying the question generation process for educators</li>
+                <li>Providing consistent and high-quality questions across different topics</li>
+                <li>Supporting various learning styles and difficulty levels</li>
+                <li>Enhancing the learning experience through AI-powered analysis</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12 gradient-text">Key Features</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="glass-card p-6 text-center">
+                <div class="text-4xl text-indigo-500 mb-4">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">AI-Powered Analysis</h3>
+                <p class="text-gray-600">Advanced text analysis to understand content complexity and generate appropriate questions</p>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="glass-card p-6 text-center">
+                <div class="text-4xl text-indigo-500 mb-4">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Topic Clustering</h3>
+                <p class="text-gray-600">Automatically organizes content into logical topics for better question distribution</p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="glass-card p-6 text-center">
+                <div class="text-4xl text-indigo-500 mb-4">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Difficulty Assessment</h3>
+                <p class="text-gray-600">Smart analysis of text complexity to suggest appropriate difficulty levels</p>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="glass-card p-6 text-center">
+                <div class="text-4xl text-indigo-500 mb-4">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Quality Validation</h3>
+                <p class="text-gray-600">Ensures generated questions and answers meet high-quality standards</p>
+            </div>
+            
+            <!-- Feature 5 -->
+            <div class="glass-card p-6 text-center">
+                <div class="text-4xl text-indigo-500 mb-4">
+                    <i class="fas fa-file-export"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Export Options</h3>
+                <p class="text-gray-600">Export generated questions in various formats for easy integration</p>
+            </div>
+            
+            <!-- Feature 6 -->
+            <div class="glass-card p-6 text-center">
+                <div class="text-4xl text-indigo-500 mb-4">
+                    <i class="fas fa-random"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Question Variety</h3>
+                <p class="text-gray-600">Ensures diverse question types and topics for comprehensive assessment</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputText = document.getElementById('inputText');
+    const textAnalysis = document.getElementById('textAnalysis');
+    const difficultyLevel = document.getElementById('difficultyLevel');
+    const keywordsList = document.getElementById('keywordsList');
+    const topicsList = document.getElementById('topicsList');
+    const suggestion = document.getElementById('suggestion');
+    
+    let debounceTimer;
+    
+    inputText.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(analyzeText, 1000);
+    });
+    
+    async function analyzeText() {
+        const text = inputText.value.trim();
+        if (text.length < 50) {
+            textAnalysis.classList.add('hidden');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/analyze_text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: text })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Update difficulty level
+                difficultyLevel.textContent = `Difficulty: ${data.difficulty.charAt(0).toUpperCase() + data.difficulty.slice(1)}`;
+                
+                // Update keywords
+                keywordsList.innerHTML = data.keywords.map(keyword => 
+                    `<span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs">${keyword}</span>`
+                ).join('');
+                
+                // Update topics
+                topicsList.innerHTML = data.topics.map(topic => `
+                    <div class="bg-gray-50 rounded-lg p-2">
+                        <div class="text-xs font-medium text-gray-700">${topic.topic}</div>
+                        <div class="text-xs text-gray-500 mt-1">${topic.sentences.length} sentences</div>
+                    </div>
+                `).join('');
+                
+                // Update suggestion
+                suggestion.textContent = data.suggestions;
+                
+                // Show analysis section
+                textAnalysis.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error analyzing text:', error);
+        }
+    }
+});
+</script>
+{% endblock %}

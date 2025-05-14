@@ -1,0 +1,228 @@
+{% extends 'layout.html' %}
+{% block head %}
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="max-w-6xl mx-auto">
+    <div class="glass-card p-8 animate__animated animate__fadeInUp">
+        <div class="grid md:grid-cols-2 gap-8 items-start mb-8">
+            <div class="text-center md:text-left">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Generated Questions & Answers</h2>
+                <p class="text-gray-600">Your customized test is ready!</p>
+            </div>
+            <div class="flex flex-wrap justify-center md:justify-end gap-4">
+                <a href="{{ url_for('index') }}" class="btn-gradient py-2 px-4 rounded-lg text-white font-medium hover:shadow-lg transition duration-200 flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Generate New Test</span>
+                </a>
+                <button onclick="showExportOptions()" class="btn-gradient py-2 px-4 rounded-lg text-white font-medium hover:shadow-lg transition duration-200 flex items-center space-x-2">
+                    <i class="fas fa-download"></i>
+                    <span>Export Test</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Export Options Modal -->
+        <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Export Options</h3>
+                    <button onclick="hideExportOptions()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <button onclick="exportTest('pdf')" class="w-full btn-gradient py-2 px-4 rounded-lg text-white font-medium hover:shadow-lg transition duration-200 flex items-center justify-center space-x-2">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>Export as PDF</span>
+                    </button>
+                    <button onclick="exportTest('word')" class="w-full btn-gradient py-2 px-4 rounded-lg text-white font-medium hover:shadow-lg transition duration-200 flex items-center justify-center space-x-2">
+                        <i class="fas fa-file-word"></i>
+                        <span>Export as Word</span>
+                    </button>
+                    <button onclick="exportTest('excel')" class="w-full btn-gradient py-2 px-4 rounded-lg text-white font-medium hover:shadow-lg transition duration-200 flex items-center justify-center space-x-2">
+                        <i class="fas fa-file-excel"></i>
+                        <span>Export as Excel</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table id="questionsTable" class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question Number</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Answer</th>
+                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quality Score</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for question, answer in cresults %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ loop.index }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ question }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ answer }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {% if answer_validation[loop.index0] %}
+                            <div class="flex items-center space-x-2">
+                                <div class="w-24 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-indigo-500 h-2 rounded-full" style="width: {{ (answer_validation[loop.index0].length_score * 100)|round }}%"></div>
+                                </div>
+                                <span>{{ (answer_validation[loop.index0].length_score * 100)|round }}%</span>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.print.min.js"></script>
+
+<script>
+    function showExportOptions() {
+        document.getElementById('exportModal').classList.remove('hidden');
+        document.getElementById('exportModal').classList.add('flex');
+    }
+
+    function hideExportOptions() {
+        document.getElementById('exportModal').classList.add('hidden');
+        document.getElementById('exportModal').classList.remove('flex');
+    }
+
+    async function exportTest(format) {
+        try {
+            const response = await fetch('/export_test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `format=${format}`
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Handle the export data based on format
+                switch(format) {
+                    case 'pdf':
+                        // Create and download PDF
+                        const pdfDoc = new jsPDF();
+                        data.data.forEach((item, index) => {
+                            if (index > 0) pdfDoc.addPage();
+                            pdfDoc.setFontSize(12);
+                            pdfDoc.text(`Question ${item.question_number}:`, 20, 20);
+                            pdfDoc.setFontSize(10);
+                            pdfDoc.text(item.question, 20, 30);
+                            pdfDoc.text('Answer:', 20, 60);
+                            pdfDoc.text(item.answer, 20, 70);
+                        });
+                        pdfDoc.save('test.pdf');
+                        break;
+                    case 'excel':
+                        // Create and download Excel
+                        const ws = XLSX.utils.json_to_sheet(data.data);
+                        const wb = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(wb, ws, "Test");
+                        XLSX.writeFile(wb, "test.xlsx");
+                        break;
+                    case 'word':
+                        // Create and download Word
+                        const docx = new window.docx.Document({
+                            sections: [{
+                                properties: {},
+                                children: data.data.map(item => [
+                                    new window.docx.Paragraph({
+                                        children: [
+                                            new window.docx.TextRun({
+                                                text: `Question ${item.question_number}:`,
+                                                bold: true,
+                                                size: 24
+                                            })
+                                        ]
+                                    }),
+                                    new window.docx.Paragraph({
+                                        children: [
+                                            new window.docx.TextRun({
+                                                text: item.question,
+                                                size: 20
+                                            })
+                                        ]
+                                    }),
+                                    new window.docx.Paragraph({
+                                        children: [
+                                            new window.docx.TextRun({
+                                                text: 'Answer:',
+                                                bold: true,
+                                                size: 20
+                                            })
+                                        ]
+                                    }),
+                                    new window.docx.Paragraph({
+                                        children: [
+                                            new window.docx.TextRun({
+                                                text: item.answer,
+                                                size: 20
+                                            })
+                                        ]
+                                    })
+                                ]).flat()
+                            }]
+                        });
+                        window.docx.Packer.toBlob(docx).then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'test.docx';
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                        });
+                        break;
+                }
+                hideExportOptions();
+            }
+        } catch (error) {
+            console.error('Error exporting test:', error);
+            alert('Error exporting test. Please try again.');
+        }
+    }
+
+    $(document).ready(function() {
+        $('#questionsTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+            pageLength: 10,
+            order: [[0, 'asc']],
+            responsive: true,
+            language: {
+                search: "Search questions:",
+                lengthMenu: "Show _MENU_ questions per page",
+                info: "Showing _START_ to _END_ of _TOTAL_ questions",
+                paginate: {
+                    first: "First",
+                    last: "Last",
+                    next: "Next",
+                    previous: "Previous"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question and Answer Generator</title>
+  
+  <!-- Modern CSS Framework -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+  
+  <!-- Custom Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- DataTables -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .btn-gradient {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .header-gradient {
+      background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+    }
+    .footer-gradient {
+      background: linear-gradient(135deg, #2d3748 0%, #1a365d 100%);
+    }
+  </style>
+  
+  {% block head %}{% endblock %}
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header-gradient text-white py-4">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold">Question and Answer Generator</h1>
+          <p class="text-sm text-gray-300">AI-Powered Question Generation System</p>
+        </div>
+        <nav class="hidden md:flex space-x-6">
+          <a href="/" class="hover:text-gray-300 transition duration-200">Home</a>
+          <a href="#about" class="hover:text-gray-300 transition duration-200">About</a>
+          <a href="#features" class="hover:text-gray-300 transition duration-200">Features</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow container mx-auto px-4 py-8">
+    <div class="text-center mb-12 animate__animated animate__fadeIn">
+      <h1 class="text-4xl md:text-5xl font-bold gradient-text mb-4">
+        Automated Questions and Answer Generator
+      </h1>
+      <p class="text-gray-600 text-lg">
+        Transform your text into comprehensive questions and answers
+      </p>
+    </div>
+    
+    {% block body %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer-gradient text-white py-8">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Project Details -->
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Project Details</h3>
+          <p class="text-sm text-gray-300 mb-2">This is a societal project developed as part of academic requirements at CMR Institute of Technology, Bangalore.</p>
+          <p class="text-sm text-gray-300">The project aims to provide an AI-powered solution for generating high-quality questions and answers from any given text.</p>
+        </div>
+
+        <!-- Technology Stack -->
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Technology Stack</h3>
+          <ul class="space-y-2 text-sm text-gray-300">
+            <li><i class="fab fa-python mr-2"></i>Python</li>
+            <li><i class="fab fa-flask mr-2"></i>Flask Framework</li>
+            <li><i class="fas fa-brain mr-2"></i>NLTK & Machine Learning</li>
+            <li><i class="fab fa-html5 mr-2"></i>HTML5 & Tailwind CSS</li>
+            <li><i class="fab fa-js mr-2"></i>JavaScript</li>
+            <li><i class="fas fa-database mr-2"></i>Natural Language Processing</li>
+          </ul>
+        </div>
+
+        <!-- Team -->
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Developed By</h3>
+          <ul class="space-y-2 text-sm text-gray-300">
+            <li><i class="fas fa-user mr-2"></i>Vignesh K S</li>
+            <li><i class="fas fa-user mr-2"></i>Vasantha</li>
+            <li><i class="fas fa-user mr-2"></i>Vaishnavi</li>
+          </ul>
+          <div class="mt-4">
+            <p class="text-sm text-gray-300">
+              <i class="fas fa-university mr-2"></i>
+              CMR Institute of Technology, Bangalore
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Copyright -->
+      <div class="mt-8 pt-8 border-t border-gray-700 text-center text-sm text-gray-300">
+        <p>&copy; 2024 Question and Answer Generator. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+  
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>
